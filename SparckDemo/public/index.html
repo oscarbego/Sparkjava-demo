@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html ng-app>
+    <head>
+        
+        <script src="angular.js"></script>
+        
+    </head>
+    <body ng-controller="ctrl">
+        
+        Nombre: <input ng-model="producto.nombre">
+        Descripcion: <input ng-model="producto.descri">
+        Precio: <input ng-model="producto.precio">
+        <br>
+        <button ng-click="add(producto)">Add</button>
+            
+        <hr>
+        <div>
+            <ul>
+                <li ng-repeat="p in productos">
+                    <h3> {{p.nombre}} - {{p.precio}} pesos </h3>
+                    
+                    {{p.descri}}
+                    <hr>
+                </li>
+            </ul>
+            
+        </div>
+    </body>
+</html>
+<script>
+    function ctrl($scope, $http)
+    {
+        $scope.productos = [];
+        
+        $scope.loadProd = function()
+        {
+            $http.get("lista").success(
+                    function(data)
+                    {
+                        $scope.productos = data;
+                    }
+            );
+            
+        }
+        
+        $scope.add = function(p)
+        {
+            console.log("--> " + p);
+            
+            $http({
+                    url: 'add',
+                    method: "POST",
+                    data: "nombre=" + p.nombre + "&descri=" + p.descri + "&precio=" + p.precio,
+                    headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+                })
+            .then(
+                function(response) {
+                    
+                    $scope.productos = response.data;
+                }, 
+                function(response) { // optional
+                    // failed
+                }
+            );
+        }
+        
+        $scope.loadProd();
+    }    
+</script>
